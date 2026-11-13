@@ -28,3 +28,10 @@ Should handle tagged dotfiles with spaces
 
   $ assert_linked "$HOME/.sublime text 5.config" "$HOME/.dotfiles/tag-whatever/sublime text 5.config"
   > assert_linked "$HOME/.example3" "$HOME/.dotfiles/tag-whatever/example3"
+
+Parent directories containing printf sequences are treated as filename data
+
+  $ mkdir -p 'pct%shome/.dotfiles'
+  $ touch 'pct%shome/.example'
+  $ (cd 'pct%shome' && env HOME="$PWD" RCRC="$PWD/.rcrc" mkrc .example)
+  $ assert_linked "$HOME/pct%shome/.example" "$HOME/pct%shome/.dotfiles/example"

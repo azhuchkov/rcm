@@ -120,11 +120,7 @@ fi
 files=""
 for i; do
   exit_if_dangerous "$i"
-  case "$i" in
-    /*) : ;;
-    *) [ -e "$PWD/$i" ] && i="$PWD/$i" ;;
-  esac
-  files="$(printf "$files\n$i")"
+  files="$(printf '%s\n%s' "$files" "$i")"
 done
 
 for DOTFILES_DIR in "$OPT_DOTFILES_DIR" $DOTFILES_DIRS "$DEFAULT_DOTFILES_DIR"; do
@@ -151,16 +147,12 @@ elif [ $force_symlink -eq 0 ]; then
   done
 fi
 
+# Dotting overrides apply to every operand; keep the pattern as a literal argument.
+set --
 if [ $undotted -eq 1 ]; then
-  for file in $files; do
-    dedotted="$(de_dot "$file")"
-    INSTALL="$INSTALL -U ${dedotted%%/*}"
-  done
+  set -- -U '*'
 elif [ $undotted -eq 0 ]; then
-  for file in $files; do
-    dedotted="$(de_dot "$file")"
-    INSTALL="$INSTALL -u ${dedotted%%/*}"
-  done
+  set -- -u '*'
 fi
 
 saved_IFS="$IFS"
@@ -168,6 +160,10 @@ IFS='
 '
 for file in $files; do
   IFS="$saved_IFS"
+  case "$file" in
+    /*) : ;;
+    *) [ -e "$PWD/$file" ] && file="$PWD/$file" ;;
+  esac
 
   dotless="$(de_dot "$file")"
   dest="$(destination "$DOTFILES_DIR" "$dotless" $in_host "$tag")"
@@ -175,5 +171,5 @@ for file in $files; do
   $VERBOSE "Moving..."
   mv_v "$file" "$dest/$dotless"
   $VERBOSE "Linking..."
-  $INSTALL -d "$DOTFILES_DIR" -t "${tag:--}" $install_args "$dotless"
+  $INSTALL "$@" -d "$DOTFILES_DIR" -t "${tag:--}" $install_args "$dotless"
 done

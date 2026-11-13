@@ -62,3 +62,14 @@ Explicit -u overrides UNDOTTED for relative filenames from a subdirectory
   $ cat .folder/subfolder/relative
   dotted
   $ refute 'should not create an undotted link' -e "$HOME/folder/subfolder/relative"
+
+Dotting overrides preserve spaces in parent directories and multiple operands
+
+  $ mkdir -p 'my scripts' '.my scripts'
+  $ touch 'my scripts/tool' 'my scripts/other' '.my scripts/dotted'
+  $ (cd 'my scripts' && mkrc -U tool other)
+  $ assert_linked "$HOME/my scripts/tool" "$HOME/.dotfiles/my scripts/tool"
+  $ assert_linked "$HOME/my scripts/other" "$HOME/.dotfiles/my scripts/other"
+  $ echo 'UNDOTTED="*"' > .rcrc
+  $ (cd '.my scripts' && mkrc -u dotted)
+  $ assert_linked "$HOME/.my scripts/dotted" "$HOME/.dotfiles/my scripts/dotted"

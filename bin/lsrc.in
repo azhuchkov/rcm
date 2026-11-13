@@ -353,6 +353,9 @@ for DOTFILES_DIR in $DOTFILES_DIRS; do
     pushdir "$(basename "$host_files")"
     for escaped_file in ${FILES:-*}; do
       file="$(decode "$escaped_file")"
+      while [ "${file#./}" != "$file" ]; do
+        file="${file#./}"
+      done
       dotted=0
       if is_excluded "${file%%/*}" "$undotted_file_globs" "$never_undotted_file_globs"; then
         dotted=1
@@ -370,6 +373,9 @@ for DOTFILES_DIR in $DOTFILES_DIRS; do
       pushdir "$(basename "tag-$tag")"
       for escaped_file in ${FILES:-*}; do
         file="$(decode "$escaped_file")"
+        while [ "${file#./}" != "$file" ]; do
+          file="${file#./}"
+        done
         $DEBUG "TAG: $tag, exclude_file_globs: $exclude_file_globs"
         dotted=0
         if is_excluded "${file%%/*}" "$undotted_file_globs" "$never_undotted_file_globs"; then
@@ -385,6 +391,9 @@ for DOTFILES_DIR in $DOTFILES_DIRS; do
 
   for escaped_file in ${FILES:-*}; do
     file="$(decode "$escaped_file")"
+    while [ "${file#./}" != "$file" ]; do
+      file="${file#./}"
+    done
     dotted=0
     if is_metafile "$file"; then
       continue
