@@ -150,12 +150,12 @@ fi
 if [ $undotted -eq 1 ]; then
   for file in $files; do
     dedotted="$(de_dot "$file")"
-    INSTALL="$INSTALL -U $dedotted"
+    INSTALL="$INSTALL -U ${dedotted%%/*}"
   done
 elif [ $undotted -eq 0 ]; then
   for file in $files; do
     dedotted="$(de_dot "$file")"
-    INSTALL="$INSTALL -u $dedotted"
+    INSTALL="$INSTALL -u ${dedotted%%/*}"
   done
 fi
 

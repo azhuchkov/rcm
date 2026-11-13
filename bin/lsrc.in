@@ -354,7 +354,7 @@ for DOTFILES_DIR in $DOTFILES_DIRS; do
     for escaped_file in ${FILES:-*}; do
       file="$(decode "$escaped_file")"
       dotted=0
-      if is_excluded "$file" "$undotted_file_globs" "$never_undotted_file_globs"; then
+      if is_excluded "${file%%/*}" "$undotted_file_globs" "$never_undotted_file_globs"; then
         dotted=1
       fi
 
@@ -372,7 +372,7 @@ for DOTFILES_DIR in $DOTFILES_DIRS; do
         file="$(decode "$escaped_file")"
         $DEBUG "TAG: $tag, exclude_file_globs: $exclude_file_globs"
         dotted=0
-        if is_excluded "$file" "$undotted_file_globs" "$never_undotted_file_globs"; then
+        if is_excluded "${file%%/*}" "$undotted_file_globs" "$never_undotted_file_globs"; then
           dotted=1
         fi
         handle_file "$file" "$DEST_DIR" "$DOTFILES_DIR/tag-$tag" . "$dotted" "$exclude_file_globs" "$include_file_globs" "$symlink_dirs_file_globs" "$mk_dirs_file_globs"
@@ -390,7 +390,8 @@ for DOTFILES_DIR in $DOTFILES_DIRS; do
       continue
     fi
 
-    if is_excluded "$file" "$undotted_file_globs" "$never_undotted_file_globs"; then
+    # Only the top-level component receives a dot, even for explicit nested paths.
+    if is_excluded "${file%%/*}" "$undotted_file_globs" "$never_undotted_file_globs"; then
       dotted=1
     fi
 
