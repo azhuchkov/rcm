@@ -43,3 +43,22 @@ Explicit -U applies to a nested file without configuration
   $ touch scripts/subfolder/file
   $ mkrc -U scripts/subfolder/file
   $ assert_linked "$HOME/scripts/subfolder/file" "$HOME/.dotfiles/scripts/subfolder/file"
+
+Explicit -U resolves relative filenames from a subdirectory
+
+  $ echo undotted > scripts/subfolder/relative
+  $ (cd scripts/subfolder && mkrc -U relative)
+  $ assert_linked "$HOME/scripts/subfolder/relative" "$HOME/.dotfiles/scripts/subfolder/relative"
+  $ cat scripts/subfolder/relative
+  undotted
+  $ refute 'should not create .scripts' -e "$HOME/.scripts"
+
+Explicit -u overrides UNDOTTED for relative filenames from a subdirectory
+
+  $ echo 'UNDOTTED="folder"' > .rcrc
+  $ echo dotted > .folder/subfolder/relative
+  $ (cd .folder/subfolder && mkrc -u relative)
+  $ assert_linked "$HOME/.folder/subfolder/relative" "$HOME/.dotfiles/folder/subfolder/relative"
+  $ cat .folder/subfolder/relative
+  dotted
+  $ refute 'should not create an undotted link' -e "$HOME/folder/subfolder/relative"

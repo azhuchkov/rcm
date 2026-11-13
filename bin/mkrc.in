@@ -119,7 +119,11 @@ fi
 
 files=""
 for i; do
-  exit_if_dangerous "$i" 
+  exit_if_dangerous "$i"
+  case "$i" in
+    /*) : ;;
+    *) [ -e "$PWD/$i" ] && i="$PWD/$i" ;;
+  esac
   files="$(printf "$files\n$i")"
 done
 
@@ -164,10 +168,6 @@ IFS='
 '
 for file in $files; do
   IFS="$saved_IFS"
-  case "$file" in
-    /*) : ;;
-    *) [ -e "$PWD/$file" ] && file="$PWD/$file" ;;
-  esac
 
   dotless="$(de_dot "$file")"
   dest="$(destination "$DOTFILES_DIR" "$dotless" $in_host "$tag")"
