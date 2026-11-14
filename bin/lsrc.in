@@ -194,7 +194,16 @@ is_excluded() {
 
   $DEBUG "is_excluded $file $exclude_file_globs $include_file_globs"
 
-  for exclude_file_glob in $exclude_file_globs; do
+  # Split the pattern list without expanding it against the current directory.
+  local shell_options="$-"
+  set -f
+  set -- $exclude_file_globs
+  case "$shell_options" in
+    *f*) ;;
+    *) set +f ;;
+  esac
+
+  for exclude_file_glob; do
     $DEBUG "file: $file"
     $DEBUG "exclude_file_glob: $exclude_file_glob"
 
@@ -221,7 +230,15 @@ is_single_excluded() {
 
   case "$file" in
     $exclude_file_glob)
-      for include_file_glob in $include_file_globs; do
+      local shell_options="$-"
+      set -f
+      set -- $include_file_globs
+      case "$shell_options" in
+        *f*) ;;
+        *) set +f ;;
+      esac
+
+      for include_file_glob; do
         case "$file" in
           $include_file_glob) return 1;;
         esac

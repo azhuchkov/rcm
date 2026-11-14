@@ -1,6 +1,6 @@
 rcm (@PACKAGE_VERSION@) unstable; urgency=low
 
-  * BUGFIX: respect UNDOTTED when mkrc installs nested files (#241).
+  * BUGFIX: respect UNDOTTED patterns when mkrc installs nested files (#241).
 
 rcm (1.3.6) unstable; urgency=low
 

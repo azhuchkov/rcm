@@ -73,3 +73,25 @@ Dotting overrides preserve spaces in parent directories and multiple operands
   $ echo 'UNDOTTED="*"' > .rcrc
   $ (cd '.my scripts' && mkrc -u dotted)
   $ assert_linked "$HOME/.my scripts/dotted" "$HOME/.dotfiles/my scripts/dotted"
+
+Wildcard UNDOTTED preserves brackets in directory names (#241)
+
+  $ echo 'UNDOTTED="folder*"' > .rcrc
+  $ mkdir -p 'folder[1]/subfolder'
+  $ echo brackets > 'folder[1]/subfolder/configured'
+  $ mkrc "$HOME/folder[1]/subfolder/configured"
+  $ assert_linked "$HOME/folder[1]/subfolder/configured" "$HOME/.dotfiles/folder[1]/subfolder/configured"
+  $ cat 'folder[1]/subfolder/configured'
+  brackets
+  $ refute 'should not create .folder[1]' -e "$HOME/.folder[1]"
+
+Explicit dotting overrides preserve brackets in directory names
+
+  $ touch 'folder[1]/subfolder/undotted'
+  $ mkrc -U 'folder[1]/subfolder/undotted'
+  $ assert_linked "$HOME/folder[1]/subfolder/undotted" "$HOME/.dotfiles/folder[1]/subfolder/undotted"
+  $ mkdir -p '.folder[1]/subfolder'
+  $ touch '.folder[1]/subfolder/dotted'
+  $ mkrc -u '.folder[1]/subfolder/dotted'
+  $ assert_linked "$HOME/.folder[1]/subfolder/dotted" "$HOME/.dotfiles/folder[1]/subfolder/dotted"
+  $ refute 'should not create an undotted link' -e "$HOME/folder[1]/subfolder/dotted"
